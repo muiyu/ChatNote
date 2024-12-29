@@ -1,0 +1,24 @@
+{
+  "name": "knowledge-agent-project",
+  "version": "1.0.0",
+  "description": "A project that implements a knowledge base agent using LangChain.",
+  "main": "src/App.js",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "dependencies": {
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-scripts": "4.0.3",
+    "axios": "^0.21.1"
+  },
+  "devDependencies": {
+    "eslint": "^7.14.0",
+    "eslint-config-react-app": "^6.0.0"
+  },
+  "homepage": "http://localhost:3000",
+  "license": "MIT"
+}
