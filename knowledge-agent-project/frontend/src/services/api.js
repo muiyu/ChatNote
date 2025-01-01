@@ -1,21 +1,19 @@
-export const fetchAgentResponse = async (query) => {
-    try {
-        const response = await fetch('/api/agent/query', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ query }),
-        });
+import axios from 'axios';
 
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
+export const uploadMarkdownFile = async (file, question) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('question', question);
 
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Error fetching agent response:', error);
-        throw error;
-    }
+  try {
+    const response = await axios.post('/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error uploading file:', error);
+    throw error;
+  }
 };
