@@ -23,7 +23,7 @@
 
 
 <script>
-import Sidebar from "@/components/Sidebar.vue";
+import Sidebar from "@/components/SideBar.vue";
 import MainContent from "@/components/MainContent.vue";
 
 export default {
