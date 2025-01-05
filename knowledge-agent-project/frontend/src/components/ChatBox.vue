@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
     <div class="chat">
       <div class="chat-window">
         <p v-for="(message, index) in messages" :key="index">{{ message }}</p>
@@ -56,4 +56,4 @@
     border-radius: 5px;
   }
   </style>
-  
+   -->
