@@ -11,7 +11,6 @@
         :is-collapsed="isSidebarCollapsed"
       />
 
-
       <!-- 主内容区 -->
       <MainContent
         :currentConversation="currentConversation"
@@ -21,39 +20,44 @@
   </div>
 </template>
 
-
 <script>
+// import axios from 'axios';
 import Sidebar from "@/components/SideBar.vue";
 import MainContent from "@/components/MainContent.vue";
 
 export default {
   data() {
     return {
-      isSidebarCollapsed: false, // 侧边栏是否收起
-      conversations: [], // 对话列表
-      currentConversation: null, // 当前选中的对话
+      isSidebarCollapsed: false, 
+      conversations: [], 
+      currentConversation: null, 
     };
   },
   methods: {
     toggleSidebar() {
-      this.isSidebarCollapsed = !this.isSidebarCollapsed; // 切换侧边栏状态
+      this.isSidebarCollapsed = !this.isSidebarCollapsed;
     },
     createNewConversation() {
       const newConversation = {
-        id: Date.now(),
-        title: `新对话 ${this.conversations.length + 1}`,
-        messages: [],
+        id: Date.now(), 
+        title: `新对话 ${this.conversations.length + 1}`, 
+        messages: [], 
       };
-      this.conversations.push(newConversation);
-      this.currentConversation = newConversation; // 自动切换到新对话
+      this.conversations.push(newConversation); 
+      this.currentConversation = newConversation; 
     },
+
     selectConversation(conversation) {
-      this.currentConversation = conversation; // 切换当前选中的对话
+      this.currentConversation = conversation; 
     },
-    sendMessage(message) {
-      if (this.currentConversation) {
-        this.currentConversation.messages.push(message); // 添加消息到当前对话
+
+    async sendMessage(message) {
+      if (!this.currentConversation) {
+        alert('请先新建对话！');
+        return;
       }
+
+      this.currentConversation.messages.push(message);
     },
   },
   components: {
@@ -62,7 +66,6 @@ export default {
   },
 };
 </script>
-
 
 <style scoped>
 /* 整体容器样式 */

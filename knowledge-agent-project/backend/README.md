@@ -12,7 +12,7 @@ knowledge-agent-project
 │   │   ├── agents
 │   │   │   └── knowledge_agent.py # 知识库代理实现
 │   │   ├── services
-│   │   │   └── langchain_service.py # LangChain服务实现
+│   │   │   └── deepseek_v2_langchain.py # LangChain服务实现
 │   │   └── utils
 │   │       └── helpers.py        # 辅助函数
 │   ├── requirements.txt           # Python依赖项
