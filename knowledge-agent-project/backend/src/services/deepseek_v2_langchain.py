@@ -1,5 +1,3 @@
-# pip3 install langchain_openai
-# python3 deepseek_v2_langchain.py
 import markdown
 from bs4 import BeautifulSoup
 import re
@@ -11,69 +9,91 @@ from langchain.schema import Document
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
-def markdown_to_text(markdown_file):
-    """
-    将 Markdown 文件转换为纯文本。
 
-    :param markdown_file: Markdown 文件的路径
-    :return: 纯文本内容
-    """
-    # 读取 Markdown 文件
-    with open(markdown_file, 'r', encoding='utf-8') as file:
-        markdown_content = file.read()
+class LangChainService:
+    def __init__(self, question, markdown_content=None):
+        """
+        初始化 LangChainService。
+        :param question: 问题
+        :param markdown_content: Markdown 内容（可选）
+        """
+        self.markdown_content = markdown_content  # Markdown 内容（可选）
+        self.question = question  # 问题
+        self.llm = ChatOpenAI(
+            model='deepseek-chat',
+            openai_api_key='sk-764e5f5acea340ea816a014d1503f749',
+            openai_api_base='https://api.deepseek.com',
+            max_tokens=1024
+        )
+        self.embeddings = OllamaEmbeddings(model="llama2-chinese:13b")
 
-    # 将 Markdown 转换为 HTML
-    html_content = markdown.markdown(markdown_content)
+    def markdown_to_text(self):
+        """
+        将 Markdown 内容转换为纯文本。
+        """
+        if not self.markdown_content:
+            return ""  # 如果没有 Markdown 内容，返回空字符串
 
-    # 使用 BeautifulSoup 提取纯文本
-    soup = BeautifulSoup(html_content, 'html.parser')
-    plain_text = soup.get_text()
+        html_content = markdown.markdown(self.markdown_content)
+        soup = BeautifulSoup(html_content, 'html.parser')
+        plain_text = soup.get_text()
+        plain_text = re.sub(r'\n\s*\n', '\n\n', plain_text).strip()
+        return plain_text
 
-    plain_text = re.sub(r'\n\s*\n', '\n\n', plain_text)  # 将连续的空行替换为单个空行
-    plain_text = plain_text.strip() 
+    def create_vectorstore(self):
+        """
+        创建向量存储。
+        """
+        if not self.markdown_content:
+            return None  # 如果没有 Markdown 内容，返回 None
 
-    return plain_text
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=200, chunk_overlap=20)
+        chunks = text_splitter.split_text(self.markdown_to_text())
+        documents = [Document(page_content=chunk) for chunk in chunks]
+        vectorstore = FAISS.from_documents(documents[:5], embedding=self.embeddings)
+        return vectorstore.as_retriever()
 
-llm = ChatOpenAI(
-    model='deepseek-chat', 
-    openai_api_key='sk-764e5f5acea340ea816a014d1503f749', 
-    openai_api_base='https://api.deepseek.com',
-    max_tokens=1024
-)
+    def build_chain(self, retriever=None):
+        """
+        构建处理链。
+        :param retriever: 向量存储的检索器（可选）
+        """
+        if retriever:
+            # 如果有向量存储，使用上下文回答问题
+            template = """Answer the question based only on the following context:
+            {context}
 
-# response = llm.invoke("Hi!")
-# print(response.content)
+            Question: {question}
+            """
+            prompt = ChatPromptTemplate.from_template(template)
+            chain = (
+                {
+                    "context": retriever,
+                    "question": RunnablePassthrough()
+                }
+                | prompt
+                | self.llm
+                | StrOutputParser()
+            )
+        else:
+            # 如果没有向量存储，直接回答问题
+            template = """Answer the following question:
+            Question: {question}
+            """
+            prompt = ChatPromptTemplate.from_template(template)
+            chain = (
+                {"question": RunnablePassthrough()}
+                | prompt
+                | self.llm
+                | StrOutputParser()
+            )
+        return chain
 
-markdown_file = "example.md"  # 替换为你的 Markdown 文件路径
-plain_text = markdown_to_text(markdown_file)
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=200, chunk_overlap=20)
-chunks = text_splitter.split_text(plain_text)
-# print(chunks)
-# print("-------------------------------------------------")
-documents = [Document(page_content=chunk) for chunk in chunks]
-# print(documents)
-
-local_embeddings = OllamaEmbeddings(model="llama2-chinese:13b")
-vectorstore = FAISS.from_documents(documents[:5], embedding=local_embeddings)
-retriever = vectorstore.as_retriever()
-
-template = """Answer the question based only on the following context:
-{context}
-
-Question: {question}
-"""
-prompt = ChatPromptTemplate.from_template(template)
-
-chain = (
-    {
-        "context": retriever,
-        "question": RunnablePassthrough()
-    }
-    | prompt
-    | llm
-    | StrOutputParser()
-)
-
-question = "超标量处理是什么" 
-response = chain.invoke(question)
-print(response)
+    def process_query(self):
+        """
+        处理查询。
+        """
+        retriever = self.create_vectorstore()  # 创建向量存储（如果有 Markdown 内容）
+        chain = self.build_chain(retriever)  # 构建处理链
+        response = chain.invoke(self.question)  # 调用处理链
+        return response
