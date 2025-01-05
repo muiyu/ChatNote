@@ -3,12 +3,13 @@ from bs4 import BeautifulSoup
 import re
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import ChatOpenAI
-from langchain_ollama import OllamaEmbeddings
+# from langchain_ollama import OllamaEmbeddings
 from langchain_community.vectorstores.faiss import FAISS
 from langchain.schema import Document
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
+from langchain_openai import OpenAIEmbeddings
 
 class LangChainService:
     def __init__(self, question, markdown_content=None):
@@ -20,12 +21,14 @@ class LangChainService:
         self.markdown_content = markdown_content  # Markdown 内容（可选）
         self.question = question  # 问题
         self.llm = ChatOpenAI(
-            model='deepseek-chat',
-            openai_api_key='sk-764e5f5acea340ea816a014d1503f749',
-            openai_api_base='https://api.deepseek.com',
+            model='gpt-4o',
+            # openai_api_key='sk-764e5f5acea340ea816a014d1503f749',
+            openai_api_key='sk-opY6CKcbbMrAOfABAf5d1cA463Bd41D4881b979d1a1f8aC5',
+            # openai_api_base='https://api.deepseek.com',
+            openai_api_base='https://api.yesapikey.com/v1',
             max_tokens=1024
         )
-        self.embeddings = OllamaEmbeddings(model="llama2-chinese:13b")
+        self.embeddings = OpenAIEmbeddings()
 
     def markdown_to_text(self):
         """
@@ -96,4 +99,5 @@ class LangChainService:
         retriever = self.create_vectorstore()  # 创建向量存储（如果有 Markdown 内容）
         chain = self.build_chain(retriever)  # 构建处理链
         response = chain.invoke(self.question)  # 调用处理链
+        print(response)  # 打印响应
         return response
