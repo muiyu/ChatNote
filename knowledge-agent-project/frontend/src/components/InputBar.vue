@@ -60,20 +60,18 @@ export default {
       textarea.style.height = `${textarea.scrollHeight}px`; // 动态调整高度
     },
     sendMessage() {
-      if (!this.newMessage.trim()&& !this.file) {
+      if (!this.newMessage.trim() && !this.file) {
         alert('请输入问题内容！');
         return;
       }
-      
-      // 缓存消息内容
+
       const message = this.newMessage.trim();
-      
-      // 清空输入框内容
+
+      // 清空输入框
       this.newMessage = "";
 
-      // 发送消息
       if (this.file) {
-        this.uploadFile(message);
+        this.uploadFile(null, message); // event 传 null，message 传文本
       } else {
         this.sendQuestionOnly(message);
       }
@@ -84,25 +82,19 @@ export default {
     toggleEngine() {
       this.engineOn = !this.engineOn; // 切换图问引擎状态
     },
-    async uploadFile(event) {
-      if (this.isUploading) return;
-      if (event) {
+    async uploadFile(event, message) {
+      if (event && event.target && event.target.files) {
         this.file = event.target.files[0];
-        event.target.value = ''; 
-      }
-      if (!this.file) {
-        alert('请选择一个文件。');
-        return;
-      }
-      if (!this.newMessage.trim()) {
-        alert('请输入问题内容！');
-        return;
       }   
 
-      console.log('this.file:', this.file);
+      if (!this.file && !message) {
+        alert('文件或消息内容都为空');
+        return;
+      }
+
       const formData = new FormData();
       formData.append("file", this.file);
-      formData.append("question", this.newMessage.trim());
+      formData.append("question", message ? message : this.newMessage.trim());
 
       this.isUploading = true;
       this.$emit("send", { type: "user", content: this.newMessage.trim() });
@@ -130,13 +122,13 @@ export default {
         this.isUploading = false;
       }
     },
-    async sendQuestionOnly() {
-      this.$emit("send", { type: "user", content: this.newMessage.trim() });
+    async sendQuestionOnly(message) {
+      // 使用传进来的 message
+      this.$emit("send", { type: "user", content: message });
       try {
         const response = await axios.post(this.getApiUrl('question'), {
-          question: this.newMessage.trim(),
+          question: message,
         });
-        console.log("Response from server:", response.data, response.data.response);
         if (response.data && response.data.response) {
           this.$emit("send", { type: "bot", content: response.data.response });
         } else {
@@ -144,7 +136,10 @@ export default {
         }
       } catch (error) {
         console.error("问题发送失败:", error);
-        this.$emit("send", { type: "bot", content: `[问题发送失败]\n错误信息: ${error.message}` });
+        this.$emit("send", {
+          type: "bot",
+          content: `[问题发送失败]\n错误信息: ${error.message}`
+        });
       }
     },
     getApiUrl(endpoint) {
