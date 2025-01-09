@@ -10,7 +10,7 @@
       <div class="header">
         <div class="title">
           <img src="@/assets/the-ship-svgrepo-com.svg" alt="DeepSeek Logo" class="logo" />
-          <h2>你好呀，我是 FunnyGo，你的智慧学习伙伴！</h2>
+          <h2>你好呀，我是 LearnSailor，你的智慧学习伙伴！</h2>
         </div>
         <p class="description">
           我可以基于文档内容进行对话，请把你的问题交给我吧~

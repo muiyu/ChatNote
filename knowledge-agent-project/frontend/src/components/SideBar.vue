@@ -2,7 +2,7 @@
   <div :class="['sidebar', { collapsed: isCollapsed }]">
     <div class="header">
       <div class="logo" v-if="!isCollapsed">
-        <span class="project-name"> FunnyGo </span>
+        <span class="project-name"> LearnSailor </span>
       </div>
       <button class="toggle-btn" @click="$emit('toggle-sidebar')">
         <img class="toggle-icon" :src="isCollapsed ? openIcon : closeIcon" />
