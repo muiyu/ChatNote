@@ -47,9 +47,11 @@
           </div>
 
           <!-- 聊天气泡 -->
-          <div class="chat-box">
+          <!-- <div class="chat-box">
             {{ message.content }}
-          </div>
+          </div> -->
+          <div class="chat-box" v-html="parseMarkdown(message.content)"></div>
+
         </div>
       </div>
     </div>
@@ -63,6 +65,7 @@
 
 <script>
 import InputBar from "@/components/InputBar.vue";
+import { marked } from "marked";
 
 export default {
   props: {
@@ -91,6 +94,10 @@ export default {
         chatWindow.scrollTop = chatWindow.scrollHeight;
       }
     },
+    parseMarkdown(content) {
+      // 解析 Markdown 为 HTML
+      return marked(content || "");
+    },
   },
   watch: {
     // 自动滚动到底部，监听消息变化
@@ -112,7 +119,7 @@ export default {
   display: flex;
   flex-direction: column;
   background-color: #fff;
-  overflow-y: auto;
+  overflow-y: hidden;
   padding: 0;
   height: 100%;
 }
@@ -173,6 +180,7 @@ export default {
 .bot-message {
   background-color: #d0edff;
 } */
+ 
 .bot-avatar {
   margin-right: 10px; /* 增加头像与气泡的距离 */
 }
@@ -304,5 +312,29 @@ h2 {
   font-size: 18px;
   color: #666;
   margin-top: 10px;
+}
+
+.chat-box {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+}
+
+.chat-box h1,
+.chat-box h2,
+.chat-box h3 {
+  margin: 10px 0;
+}
+
+.chat-box pre {
+  background: #f4f4f4;
+  padding: 10px;
+  border-radius: 5px;
+  overflow-x: auto;
+}
+
+.chat-box code {
+  background: #eee;
+  padding: 2px 4px;
+  border-radius: 3px;
 }
 </style>
