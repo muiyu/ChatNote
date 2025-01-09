@@ -39,6 +39,11 @@ knowledge-agent-project
 pip install -r requirements.txt
 ```
 
+## 导入服务 API KEY
+```
+source ~/api-key.src
+```
+
 ## 运行后端服务
 
 在后端目录下，运行以下命令启动Flask应用：
