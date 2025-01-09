@@ -90,6 +90,7 @@ export default {
     handleSendMessage(message) {
       // 触发父组件的 send-message 事件，将用户发送的消息添加到 currentConversation
       this.$emit('send-message', message);
+      console.log('[handleSendMessage] message:', message);
     },
     scrollToBottom() {
       const chatWindow = this.$refs.chatWindow;

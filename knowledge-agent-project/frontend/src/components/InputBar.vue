@@ -84,7 +84,7 @@ export default {
     toggleEngine() {
       this.engineOn = !this.engineOn; // 切换图问引擎状态
     },
-    async uploadFile(message) {
+    async uploadFile(event) {
       if (this.isUploading) return;
       if (event) {
         this.file = event.target.files[0];
@@ -102,10 +102,10 @@ export default {
       console.log('this.file:', this.file);
       const formData = new FormData();
       formData.append("file", this.file);
-      formData.append("question", message);
+      formData.append("question", this.newMessage.trim());
 
       this.isUploading = true;
-      this.$emit("send", { type: "user", content: message });
+      this.$emit("send", { type: "user", content: this.newMessage.trim() });
 
       try {
         const response = await axios.post(this.getApiUrl('upload'), formData, {
@@ -130,8 +130,8 @@ export default {
         this.isUploading = false;
       }
     },
-    async sendQuestionOnly(message) {
-      this.$emit("send", { type: "user", content: message });
+    async sendQuestionOnly() {
+      this.$emit("send", { type: "user", content: this.newMessage.trim() });
       try {
         const response = await axios.post(this.getApiUrl('question'), {
           question: this.newMessage.trim(),

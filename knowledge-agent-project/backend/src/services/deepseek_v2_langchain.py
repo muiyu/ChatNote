@@ -11,7 +11,6 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 from langchain_openai import OpenAIEmbeddings
-from langchain_ollama import OllamaEmbeddings
 
 if "OPENAI_API_KEY" not in os.environ:
     api_key = getpass.getpass("OpenAI API Key:")
