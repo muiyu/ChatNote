@@ -103,7 +103,7 @@ export default {
       this.isUploading = true;
       this.$emit("send", { type: 'user', content: this.newMessage.trim() });
       try {
-        const response = await axios.post('/api/upload', formData, {
+        const response = await axios.post(this.getApiUrl('upload'), formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -129,7 +129,7 @@ export default {
       this.$emit("send", { type: 'user', content: this.newMessage.trim() });
 
       try {
-        const response = await axios.post('/api/question', {
+        const response = await axios.post(this.getApiUrl('question'), {
           question: this.newMessage.trim(),
         });
         console.log("Response from server:", response.data, response.data.response);
@@ -144,6 +144,13 @@ export default {
       } finally {
         this.newMessage = "";
       }
+    },
+    getApiUrl(endpoint) {
+        const baseUrls = {
+          upload: this.engineOn ? '/api/upload_with_graph' : '/api/upload',
+          question: this.engineOn ? '/api/question_with_graph' : '/api/question',
+        };
+        return baseUrls[endpoint];
     },
   },
 };

@@ -1,6 +1,7 @@
 import markdown
 import re
 import os
+import getpass
 from bs4 import BeautifulSoup
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import ChatOpenAI
