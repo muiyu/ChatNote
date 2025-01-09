@@ -16,12 +16,25 @@
 
     <ul class="conversation-list" v-if="!isCollapsed">
       <li
-        v-for="conversation in conversations"
+        v-for="(conversation, index) in conversations"
         :key="conversation.id"
         :class="{ active: conversation === currentConversation }"
-        @click="$emit('select-conversation', conversation)"
       >
-        {{ conversation.title }}
+        <!-- {{ conversation.title }} -->
+        <div class="conversation-item">
+          <span @click="$emit('select-conversation', conversation)">{{ conversation.title }}</span>
+          <!-- 操作按钮 -->
+          <div class="dropdown">
+            <button class="dropdown-btn" @click.stop="toggleDropdown(index)">
+              ...
+            </button>
+            <!-- 下拉框 -->
+            <div v-if="activeDropdown === index" class="dropdown-menu">
+              <button @click.stop="$emit('rename-conversation', conversation)">重命名</button>
+              <button @click.stop="$emit('deleteConversation', conversation)">删除</button>
+            </div>
+          </div>
+        </div>
       </li>
     </ul>
   </div>
@@ -43,7 +56,30 @@ export default {
       openIcon,
       closeIcon,
       addConverIcon,
+      activeDropdown: null, // 当前打开下拉框的索引
     };
+  },
+  methods: {
+    toggleDropdown(index) {
+      // 切换下拉框的显示状态
+      this.activeDropdown = this.activeDropdown === index ? null : index;
+      this.$forceUpdate(); // 强制重新渲染，确保更新
+    },
+    renameConversation(conversation) {
+      // 重命名对话
+      const newTitle = prompt('请输入新的对话名称：', conversation.title);
+      if (newTitle) {
+        this.$emit('rename-conversation', { ...conversation, title: newTitle });
+      }
+      this.activeDropdown = null; // 关闭下拉框
+    },
+    deleteConversation(conversation) {
+      // 删除对话
+      if (confirm(`确定要删除对话 "${conversation.title}" 吗？`)) {
+        this.$emit('delete-conversation', conversation);
+      }
+      this.activeDropdown = null; // 关闭下拉框
+    },
   },
 };
 </script>
@@ -126,4 +162,57 @@ export default {
 .conversation-list li.active {
   background-color: #c7e9f9;
 }
+
+.conversation-item {
+  display: flex;
+  justify-content: space-between; /* 标题和按钮分隔两侧 */
+  align-items: center;
+}
+
+/* 下拉按钮样式 */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.dropdown-btn:hover {
+  background-color: #e6f7ff;
+  border-radius: 50%;
+}
+
+/* 下拉菜单样式 */
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column; /* 竖向排列 */
+}
+
+.dropdown-menu button {
+  background: none;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  white-space: nowrap; /* 禁止换行 */
+  width: 100%; /* 宽度占满菜单 */
+}
+
+.dropdown-menu button:hover {
+  background-color: #f0f8ff;
+  border-radius: 8px;
+}
+
 </style>
