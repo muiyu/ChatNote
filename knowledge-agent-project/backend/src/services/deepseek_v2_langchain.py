@@ -108,5 +108,4 @@ class LangChainService:
         retriever = self.create_vectorstore()  # 创建向量存储（如果有 Markdown 内容）
         chain = self.build_chain(retriever)  # 构建处理链
         response = chain.invoke(self.question)  # 调用处理链
-        print(response)  # 打印响应
         return response
