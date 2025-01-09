@@ -63,10 +63,17 @@ export default {
         return;
       }
       
+      // 缓存消息内容
+      const message = this.newMessage.trim();
+      
+      // 清空输入框内容
+      this.newMessage = "";
+
+      // 发送消息
       if (this.file) {
-        this.uploadFile();
+        this.uploadFile(message);
       } else {
-        this.sendQuestionOnly();
+        this.sendQuestionOnly(message);
       }
     },
     openFilePicker() {
@@ -75,45 +82,78 @@ export default {
     toggleEngine() {
       this.engineOn = !this.engineOn; // 切换图问引擎状态
     },
-    async uploadFile(event) {
+    // async uploadFile(event) {
+    //   if (this.isUploading) return;
+    //   if (event) {
+    //     this.file = event.target.files[0];
+    //     event.target.value = ''; 
+    //   }
+
+    //   if (!this.file) {
+    //     alert('请选择一个文件。');
+    //     return;
+    //   }
+
+    //   if (!this.newMessage.trim()) {
+    //     alert('请输入问题内容！');
+    //     return;
+    //   }   
+
+    //   console.log('this.file:', this.file);
+
+    //   const formData = new FormData();
+    //   formData.append('file', this.file);
+    //   formData.append('question', this.newMessage.trim());
+
+    //   this.isUploading = true;
+    //   this.$emit("send", { type: 'user', content: this.newMessage.trim() });
+    //   try {
+    //     const response = await axios.post('/api/upload', formData, {
+    //       headers: {
+    //         'Content-Type': 'multipart/form-data',
+    //       },
+    //     });
+    //     console.log("Response from server:", response.data, response.data.response);
+    //     if (response.data && response.data.response) {
+    //       this.$emit("send",  { type: 'bot', content: response.data.response });
+    //     } else {
+    //       this.$emit("send", {type: 'bot', content: '[问题回复，但未收到有效响应]'});
+    //     }
+    //   } catch (error) {
+    //     console.error('文件上传失败:', error);
+    //     this.$emit("send", {
+    //       type: "bot",
+    //       content: `[文件上传失败]: ${this.file.name}\n错误信息: ${error.message}`,
+    //     });
+    //   } finally {
+    //     this.file = null;
+    //     this.isUploading = false;
+    //   }
+    // },
+    async uploadFile(message) {
       if (this.isUploading) return;
-      if (event) {
-        this.file = event.target.files[0];
-        event.target.value = ''; 
-      }
-
-      if (!this.file) {
-        alert('请选择一个文件。');
-        return;
-      }
-
-      if (!this.newMessage.trim()) {
-        alert('请输入问题内容！');
-        return;
-      }   
-
-      console.log('this.file:', this.file);
 
       const formData = new FormData();
-      formData.append('file', this.file);
-      formData.append('question', this.newMessage.trim());
+      formData.append("file", this.file);
+      formData.append("question", message);
 
       this.isUploading = true;
-      this.$emit("send", { type: 'user', content: this.newMessage.trim() });
+      this.$emit("send", { type: "user", content: message });
+
       try {
-        const response = await axios.post('/api/upload', formData, {
+        const response = await axios.post("/api/upload", formData, {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
         });
         console.log("Response from server:", response.data, response.data.response);
         if (response.data && response.data.response) {
-          this.$emit("send",  { type: 'bot', content: response.data.response });
+          this.$emit("send", { type: "bot", content: response.data.response });
         } else {
-          this.$emit("send", {type: 'bot', content: '[问题回复，但未收到有效响应]'});
+          this.$emit("send", { type: "bot", content: "[问题回复，但未收到有效响应]" });
         }
       } catch (error) {
-        console.error('文件上传失败:', error);
+        console.error("文件上传失败:", error);
         this.$emit("send", {
           type: "bot",
           content: `[文件上传失败]: ${this.file.name}\n错误信息: ${error.message}`,
@@ -123,26 +163,46 @@ export default {
         this.isUploading = false;
       }
     },
-    async sendQuestionOnly() {
-      this.$emit("send", { type: 'user', content: this.newMessage.trim() });
+
+    // async sendQuestionOnly() {
+    //   this.$emit("send", { type: 'user', content: this.newMessage.trim() });
+
+    //   try {
+    //     const response = await axios.post('/api/question', {
+    //       question: this.newMessage.trim(),
+    //     });
+    //     console.log("Response from server:", response.data, response.data.response);
+    //     if (response.data && response.data.response) {
+    //       this.$emit("send", { type: 'bot', content: response.data.response });
+    //     } else {
+    //       this.$emit("send", { type: 'bot', content: '[问题回复，但未收到有效响应]' });
+    //     }
+    //   } catch (error) {
+    //     console.error('问题发送失败:', error);
+    //     this.$emit("send", { type: 'bot', content: `[问题发送失败]\n错误信息: ${error.message}` });
+    //   } finally {
+    //     this.newMessage = "";
+    //   }
+    // },
+    async sendQuestionOnly(message) {
+      this.$emit("send", { type: "user", content: message });
 
       try {
-        const response = await axios.post('/api/question', {
-          question: this.newMessage.trim(),
+        const response = await axios.post("/api/question", {
+          question: message,
         });
         console.log("Response from server:", response.data, response.data.response);
         if (response.data && response.data.response) {
-          this.$emit("send", { type: 'bot', content: response.data.response });
+          this.$emit("send", { type: "bot", content: response.data.response });
         } else {
-          this.$emit("send", { type: 'bot', content: '[问题回复，但未收到有效响应]' });
+          this.$emit("send", { type: "bot", content: "[问题回复，但未收到有效响应]" });
         }
       } catch (error) {
-        console.error('问题发送失败:', error);
-        this.$emit("send", { type: 'bot', content: `[问题发送失败]\n错误信息: ${error.message}` });
-      } finally {
-        this.newMessage = "";
+        console.error("问题发送失败:", error);
+        this.$emit("send", { type: "bot", content: `[问题发送失败]\n错误信息: ${error.message}` });
       }
     },
+
   },
 };
 </script>
