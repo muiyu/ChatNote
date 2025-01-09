@@ -10,10 +10,10 @@
       <div class="header">
         <div class="title">
           <img src="@/assets/the-ship-svgrepo-com.svg" alt="DeepSeek Logo" class="logo" />
-          <h2>我是 LearnSailor，你的个性化智能助学伙伴！</h2>
+          <h2>你好呀，我是 FunnyGo，你的智慧学习伙伴！</h2>
         </div>
         <p class="description">
-          我可以基于文档内容进行对话，请把你的任务交给我吧~
+          我可以基于文档内容进行对话，请把你的问题交给我吧~
         </p>
       </div>
     </div>
@@ -57,7 +57,10 @@
     </div>
 
     <!-- 输入栏 -->
-    <div class="input-container">
+    <!-- <div class="input-container">
+      <InputBar @send="handleSendMessage" />
+    </div> -->
+    <div v-if="currentConversation" class="input-container">
       <InputBar @send="handleSendMessage" />
     </div>
   </div>
@@ -164,22 +167,6 @@ export default {
   margin-bottom: 20px;
   max-height: calc(100vh - 200px);
 }
-
-/* .chat-message {
-  font-size: 14px;
-  color: #333;
-  margin: 10px 0;
-  padding: 8px 12px;
-  border-radius: 8px;
-}
-
-.user-message {
-  background-color: #ebfaff;
-}
-
-.bot-message {
-  background-color: #d0edff;
-} */
  
 .bot-avatar {
   margin-right: 10px; /* 增加头像与气泡的距离 */
@@ -302,14 +289,14 @@ export default {
 }
 
 h2 {
-  font-size: 30px;
+  font-size: 26px;
   font-family: Arial, Helvetica, sans-serif;
   color: #444;
   margin: 0;
 }
 
 .description {
-  font-size: 18px;
+  font-size: 15px;
   color: #666;
   margin-top: 10px;
 }

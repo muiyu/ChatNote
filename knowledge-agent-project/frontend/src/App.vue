@@ -26,6 +26,7 @@
 // import axios from 'axios';
 import Sidebar from "@/components/SideBar.vue";
 import MainContent from "@/components/MainContent.vue";
+import clickEffect from "@/assets/clickEffect.js";
 
 export default {
   data() {
@@ -90,6 +91,9 @@ export default {
   components: {
     Sidebar,
     MainContent,
+  },
+  mounted() {
+    clickEffect(); // 调用特效函数
   },
 };
 </script>

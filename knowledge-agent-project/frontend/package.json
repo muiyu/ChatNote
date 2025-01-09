@@ -10,9 +10,11 @@
   "dependencies": {
     "axios": "^1.7.9",
     "core-js": "^3.8.3",
+    "lottie-web": "^5.12.2",
     "marked": "^15.0.6",
     "pnpm": "^9.15.3",
-    "vue": "^3.2.13"
+    "vue": "^3.2.13",
+    "vue3-lottie": "^3.3.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

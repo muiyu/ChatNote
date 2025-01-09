@@ -175,7 +175,7 @@ export default {
   resize: none; 
   overflow: auto;
   background-color: aliceblue;
-  font-size: 20px;
+  font-size: 18px;
   border-radius: 10px;
   font-family: Arial, Helvetica, sans-serif;
   line-height: 1.5;
