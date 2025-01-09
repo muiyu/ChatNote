@@ -73,6 +73,8 @@ export default {
   display: flex; /* 使用 Flex 布局让 Sidebar 和 MainContent 横向排列 */
   height: 100vh; /* 占满整个视口高度 */
   overflow: hidden; /* 防止内容溢出 */
+  padding: 0;
+  margin: 0;
 }
 
 /* 侧边栏样式 */
@@ -83,11 +85,11 @@ export default {
 /* 主内容区样式 */
 .container > MainContent {
   flex-grow: 1; /* 让主内容区占据剩余空间 */
-  overflow-y: auto; /* 添加滚动支持 */
   background-color: #ffffff; /* 设置主内容区背景色为白色 */
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1); /* 添加左侧阴影，与侧边栏区分 */
   padding: 30px; /* 添加主内容区内部间距 */
   display: flex;
   flex-direction: column;
 }
+
 </style>

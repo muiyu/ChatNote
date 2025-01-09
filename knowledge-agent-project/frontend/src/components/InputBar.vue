@@ -2,7 +2,7 @@
   <div class="input-bar">
     <textarea
       v-model="newMessage"
-      placeholder="给 CloudSeek 发送消息"
+      placeholder="给 LearnSailor 发送消息"
       class="textarea"
       @input="autoResize"
     ></textarea>
@@ -24,21 +24,39 @@
       <input type="file" @change="uploadFile" hidden ref="fileInput" />
     </button>
 
+    <!-- 图问引擎按钮 -->
+    <button class="engine-btn" :class="{ active: engineOn }" @click="toggleEngine">
+      图问引擎
+      <img
+        class="engine-icon"
+        :src="engineOn ? onIcon : offIcon"
+        alt="图问引擎状态"
+      />
+    </button>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
+import onIcon from '@/assets/on.svg'; // 引入 on.svg 图标
+import offIcon from '@/assets/off.svg'; // 引入 off.svg 图标
 
 export default {
   data() {
     return {
       newMessage: "",
-      file: null,
-      isUploading: false,
+      engineOn: false, // 图问引擎开关状态
+      // 图标资源
+      onIcon,
+      offIcon,
     };
   },
   methods: {
+    autoResize(event) {
+      const textarea = event.target;
+      textarea.style.height = "auto"; // 重置高度
+      textarea.style.height = `${textarea.scrollHeight}px`; // 动态调整高度
+    },
     sendMessage() {
       if (!this.newMessage.trim()&& !this.file) {
         alert('请输入问题内容！');
@@ -53,6 +71,9 @@ export default {
     },
     openFilePicker() {
       this.$refs.fileInput.click();
+    },
+    toggleEngine() {
+      this.engineOn = !this.engineOn; // 切换图问引擎状态
     },
     async uploadFile(event) {
       if (this.isUploading) return;
@@ -133,22 +154,24 @@ export default {
   gap: 10px;
   border: 1px solid rgb(211, 227, 230);
   padding: 10px;
-  border-radius: 15px;
+  border-radius: 20px;
   background-color: #f0f8ff;
 }
 
 .textarea {
   flex-grow: 1;
-  padding: 10px;
+  padding: 10px 10px 0 10px;
   border: none;
   outline: none;
   resize: none; 
-  overflow: hidden;
+  overflow: auto;
   background-color: aliceblue;
-  font-size: 15px;
-  border-radius: 5px;
+  font-size: 20px;
+  border-radius: 10px;
   font-family: Arial, Helvetica, sans-serif;
-  line-height: 1.0;
+  line-height: 1.5;
+  min-height: 40px; /* 设置输入框最小高度 */
+  max-height: 200px; /* 可选：限制最大高度 */
 }
 
 .send-btn,
@@ -178,5 +201,35 @@ export default {
 .icon {
   width: 24px;
   height: 24px;
+}
+
+.engine-btn {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  background-color: #f0f8ff;
+  border: 1px solid #f0f8ff;
+  color: #333; /* 默认文字颜色 */
+  font-size: 16px;
+  padding: 8px 12px;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.engine-btn:hover {
+  background-color: #e3f2fd;
+}
+
+.engine-btn.active {
+  color: #1296db; /* 激活状态的文字颜色 */
+  background-color: #e3f2fd; /* 激活状态的背景颜色 */
+}
+
+
+/* 图标大小调整 */
+.engine-icon {
+  width: 40px; /* 调整图标宽度 */
+  height: 40px; /* 调整图标高度 */
 }
 </style>

@@ -21,7 +21,7 @@
     <!-- 对话窗口 -->
     <div v-if="currentConversation" class="chat-section">
       <div ref="chatWindow" class="chat-window">
-        <div v-for="(message, index) in currentConversation.messages" 
+        <!-- <div v-for="(message, index) in currentConversation.messages" 
              :key="index" 
              class="chat-message">
           <div v-if="message.type === 'user'" class="user-message">
@@ -30,6 +30,28 @@
           <div v-else class="bot-message">
             <strong>LearnSailor：</strong>{{ message.content }}
           </div>
+        </div> -->
+        <!-- 循环渲染消息 -->
+        <div
+          v-for="(message, index) in currentConversation.messages"
+          :key="index"
+          :class="['text-item', { 'text-item-right': message.type === 'user' }]"
+        >
+          <!-- 机器人头像 -->
+          <div v-if="message.type === 'bot'" class="chat-name bot-avatar">
+            <img src="@/assets/the-ship-svgrepo-com.svg" alt="Bot Avatar" class="bot-icon" />
+          </div>
+          <!-- 用户头像 -->
+          <div v-else class="chat-name">
+            User
+          </div>
+
+          <!-- 聊天气泡 -->
+          <!-- <div class="chat-box">
+            {{ message.content }}
+          </div> -->
+          <div class="chat-box" v-html="parseMarkdown(message.content)"></div>
+
         </div>
       </div>
     </div>
@@ -43,6 +65,7 @@
 
 <script>
 import InputBar from "@/components/InputBar.vue";
+import { marked } from "marked";
 
 export default {
   props: {
@@ -55,13 +78,14 @@ export default {
     InputBar,
   },
   computed: {
+    // 控制欢迎信息显示的逻辑
     showConversationHeader() {
       return this.currentConversation && this.currentConversation.messages.length > 0;
     },
   },
   methods: {
     handleSendMessage(message) {
-      // 触发父组件的 send-message 事件
+      // 触发父组件的 send-message 事件，将用户发送的消息添加到 currentConversation
       this.$emit('send-message', message);
     },
     scrollToBottom() {
@@ -70,8 +94,13 @@ export default {
         chatWindow.scrollTop = chatWindow.scrollHeight;
       }
     },
+    parseMarkdown(content) {
+      // 解析 Markdown 为 HTML
+      return marked(content || "");
+    },
   },
   watch: {
+    // 自动滚动到底部，监听消息变化
     'currentConversation.messages': {
       handler() {
         this.$nextTick(() => {
@@ -85,22 +114,21 @@ export default {
 </script>
 
 <style scoped>
-/* 保持原有样式不变 */
 .main-content {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
   background-color: #fff;
-  overflow-y: auto;
+  overflow-y: hidden;
   padding: 0;
   height: 100%;
 }
 
 .input-container {
   width: 100%;
-  max-width: 700px;
+  max-width: 800px;
   margin: 20px auto;
-  padding: 0 20px;
+  padding: 20px;
   box-sizing: border-box;
   position: sticky;
   bottom: 0;
@@ -137,7 +165,7 @@ export default {
   max-height: calc(100vh - 200px);
 }
 
-.chat-message {
+/* .chat-message {
   font-size: 14px;
   color: #333;
   margin: 10px 0;
@@ -151,6 +179,94 @@ export default {
 
 .bot-message {
   background-color: #d0edff;
+} */
+ 
+.bot-avatar {
+  margin-right: 10px; /* 增加头像与气泡的距离 */
+}
+
+.text-item {
+  display: flex;
+  align-items: flex-start; /* 更好地对齐头像和气泡 */
+  margin-bottom: 15px; /* 加大消息之间的间距 */
+}
+
+
+.text-item:last-child {
+  margin-bottom: 0;
+}
+
+.chat-name {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  border-radius: 50%; 
+  background-color: #3c8aff;
+  color: #fff;
+  flex-shrink: 0;
+  overflow: hidden; 
+}
+
+/* 机器人头像容器样式 */
+.bot-avatar {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff; /* 背景为白色 */
+  border: 1px solid #ddd; /* 可选：加一条浅色边框，提升视觉效果 */
+  border-radius: 50%; /* 圆形头像 */
+  overflow: hidden; /* 防止内容溢出 */
+  flex-shrink: 0; /* 防止容器被压缩 */
+}
+
+/* 机器人头像图标样式 */
+.bot-icon {
+  width: 100%; /* 图标占头像容器的比例 */
+  height: 100%;
+  object-fit: cover; /* 确保图标按比例缩放 */
+}
+
+/* 左侧对话气泡的箭头 */
+.chat-box:before {
+  content: "";
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  border-top: 9px solid transparent;
+  border-right: 8px solid #ffffff;
+  border-bottom: 9px solid transparent;
+  transform: translateY(-50%);
+}
+
+/* 用户消息右对齐 */
+.text-item-right {
+  justify-content: flex-end;
+}
+
+.text-item-right .chat-name {
+  order: 2;
+}
+
+.text-item-right .chat-box {
+  margin-left: 0;
+  margin-right: 12px;
+  background: #d0edff;
+  padding: 10px 15px; /* 添加内边距，增大文字与边框的间距 */
+  border-radius: 12px; /* 可选：让气泡更圆润 */
+}
+
+/* 右侧对话气泡的箭头 */
+.text-item-right .chat-box:before {
+  right: -8px;
+  border-left: 8px solid #d0edff;
+  border-right: none;
 }
 
 .conversation-header {
@@ -181,19 +297,44 @@ export default {
 }
 
 .logo {
-  width: 50px;
-  height: 50px;
+  width: 70px;
+  height: 70px;
 }
 
 h2 {
-  font-size: 24px;
+  font-size: 30px;
+  font-family: Arial, Helvetica, sans-serif;
   color: #444;
   margin: 0;
 }
 
 .description {
-  font-size: 16px;
+  font-size: 18px;
   color: #666;
   margin-top: 10px;
+}
+
+.chat-box {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+}
+
+.chat-box h1,
+.chat-box h2,
+.chat-box h3 {
+  margin: 10px 0;
+}
+
+.chat-box pre {
+  background: #f4f4f4;
+  padding: 10px;
+  border-radius: 5px;
+  overflow-x: auto;
+}
+
+.chat-box code {
+  background: #eee;
+  padding: 2px 4px;
+  border-radius: 3px;
 }
 </style>
