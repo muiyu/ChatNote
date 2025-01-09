@@ -1,15 +1,25 @@
 import markdown
-from bs4 import BeautifulSoup
 import re
+import os
+from bs4 import BeautifulSoup
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import ChatOpenAI
-# from langchain_ollama import OllamaEmbeddings
 from langchain_community.vectorstores.faiss import FAISS
 from langchain.schema import Document
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 from langchain_openai import OpenAIEmbeddings
+
+if "OPENAI_API_KEY" not in os.environ:
+    api_key = getpass.getpass("OpenAI API Key:")
+else:
+    api_key = os.environ["OPENAI_API_KEY"]
+
+if "OPENAI_BASE_URL" not in os.environ:
+    api_base = getpass.getpass("OpenAI Base URL:")
+else:
+    api_base = os.environ["OPENAI_BASE_URL"]
 
 class LangChainService:
     def __init__(self, question, markdown_content=None):
@@ -22,10 +32,8 @@ class LangChainService:
         self.question = question  # 问题
         self.llm = ChatOpenAI(
             model='gpt-4o',
-            # openai_api_key='sk-764e5f5acea340ea816a014d1503f749',
-            openai_api_key='sk-opY6CKcbbMrAOfABAf5d1cA463Bd41D4881b979d1a1f8aC5',
-            # openai_api_base='https://api.deepseek.com',
-            openai_api_base='https://api.yesapikey.com/v1',
+            openai_api_key=api_key,
+            openai_api_base=api_base,
             max_tokens=1024
         )
         self.embeddings = OpenAIEmbeddings()
@@ -50,7 +58,7 @@ class LangChainService:
         if not self.markdown_content:
             return None  # 如果没有 Markdown 内容，返回 None
 
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=200, chunk_overlap=20)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=20)
         chunks = text_splitter.split_text(self.markdown_to_text())
         documents = [Document(page_content=chunk) for chunk in chunks]
         vectorstore = FAISS.from_documents(documents[:5], embedding=self.embeddings)
