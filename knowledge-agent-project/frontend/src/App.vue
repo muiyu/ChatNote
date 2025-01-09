@@ -8,6 +8,8 @@
         @select-conversation="selectConversation"
         @new-conversation="createNewConversation"
         @toggle-sidebar="toggleSidebar"
+        @rename-conversation="renameConversation"
+        @delete-conversation="deleteConversation"
         :is-collapsed="isSidebarCollapsed"
       />
 
@@ -49,6 +51,31 @@ export default {
 
     selectConversation(conversation) {
       this.currentConversation = conversation; 
+    },
+
+    renameConversation(conversation) {
+      const newTitle = prompt("请输入新的对话名称：", conversation.title);
+      if (newTitle) {
+        const index = this.conversations.findIndex(
+          (c) => c.id === conversation.id
+        );
+        if (index !== -1) {
+          this.conversations[index].title = newTitle;
+        }
+      }
+    },
+    
+    deleteConversation(conversation) {
+      if (
+        confirm(`确定要删除对话 "${conversation.title}" 吗？`)
+      ) {
+        this.conversations = this.conversations.filter(
+          (c) => c.id !== conversation.id
+        );
+        if (this.currentConversation && this.currentConversation.id === conversation.id) {
+          this.currentConversation = null; // 如果当前对话被删除，则清空
+        }
+      }
     },
 
     async sendMessage(message) {
