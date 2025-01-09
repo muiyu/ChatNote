@@ -355,8 +355,6 @@ class GraphRAGService:
             embedding_node_property="embedding"
         )
 
-        #time.sleep(5)
-
     # -------------------------------------------------------------------------
     # 可选：把 Markdown 存到图数据库
     # 若您已经有 GraphIniter 或类似代码，可在此直接调用
@@ -382,6 +380,7 @@ class GraphRAGService:
         doc, _ = results[0]
         # doc.page_content 会是类似 "text: xxxx"
         # 若您创建 chunk 节点时并未添加 "text: " 前缀，则无需 lstrip
+        print("\n\n检索到的节点为：")
         print(doc.page_content.lstrip("\ntitle: "))
         return doc.page_content.lstrip("\ntitle: ")
 
@@ -437,7 +436,7 @@ class GraphRAGService:
             if t.strip():
                 lines.append(t.strip())
         context_str = "\n\n".join(lines)
-        print(context_str)
+        #print(context_str)
         return context_str
 
     # -------------------------------------------------------------------------
@@ -450,15 +449,26 @@ class GraphRAGService:
         2) ChatOpenAI
         3) 输出解析
         """
-        if context_str:
-            template = """Answer the question based only on the following context:
-            {context}
 
-            Question: {question}
+        system_context = """
+        您是一个知识库智能问答系统LearnSailor，将帮助学生在知识的海洋中像经验丰富的水手一样快速定位和获取所需信息，并能像导航一样指引学生的学习方向，提供更加精确的回答，解决学习过程中的各种问题。
+        具体来说，您可能收到一些问题和文档内容。如果提供了文档内容，您应该基于文档内容并结合您的知识，提供较为精确的回答；否则，请直接基于您的知识回答问题。
+        """
+
+        if context_str:
+            template = """
+            {system_context}
+
+            请基于下列文本回答最后的问题:
+            {context}
+            
+            问题: 
+            {question}
             """
             prompt = ChatPromptTemplate.from_template(template)
             chain = (
                 {
+                    "system_context": lambda x: system_context,
                     "context": RunnablePassthrough(),
                     "question": RunnablePassthrough()
                 }
@@ -469,12 +479,18 @@ class GraphRAGService:
             return chain
         else:
             # 如果检索不到上下文，就直接回答
-            template = """Answer the following question:
-            Question: {question}
+            template = """
+            {system_context}
+
+            请回答下列问题:
+            {question}
             """
             prompt = ChatPromptTemplate.from_template(template)
             chain = (
-                {"question": RunnablePassthrough()}
+                {
+                    "system_context": lambda x: system_context,
+                    "question": RunnablePassthrough()
+                }
                 | prompt
                 | self.llm
                 | StrOutputParser()
@@ -501,28 +517,7 @@ class GraphRAGService:
             "question": self.question
         }
         answer = chain.invoke(inputs)
-        print(answer)
+        #print(answer)
 
         # 4. 返回答案
         return answer
-
-
-# ------------------------------------------------------------------------------
-# 使用示例
-# ------------------------------------------------------------------------------
-if __name__ == "__main__":
-    """
-    假设已经有部分数据存入 Neo4j 图数据库中，或者您传入了新的 markdown_content。
-    这里仅演示基本用法。
-    """
-    # 读取 MD 文件
-    with open("./notes/note-2.md", "r", encoding="utf-8") as f:
-        md_content = f.read()
-
-    service = GraphRAGService(
-        question="你能介绍一下太阳系的行星吗？",
-        markdown_content=md_content  # 如果已经构建好图，可以不传
-    )
-    response = service.process_query()
-    print("---- 最终回答 ----")
-    print(response)

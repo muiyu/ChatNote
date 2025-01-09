@@ -70,18 +70,21 @@ class LangChainService:
         构建处理链。
         :param retriever: 向量存储的检索器（可选）
         """
-        system_context = """你是一个知识库智能问答系统LearnSailor，
-                            帮助学生在知识的海洋中像经验丰富的水手一样快速定位和获取所需信息，
-                            基于上传的资料信息构建本地知识图谱，能像导航一样指引学生的学习方向，并提供更加精确的回答，解决学习过程中的各种问题。
+        
+        system_context = """
+        您是一个知识库智能问答系统LearnSailor，将帮助学生在知识的海洋中像经验丰富的水手一样快速定位和获取所需信息，并能像导航一样指引学生的学习方向，提供更加精确的回答，解决学习过程中的各种问题。
+        具体来说，您可能收到一些问题和文档内容。如果提供了文档内容，您应该基于文档内容提供精确的回答；否则，请直接基于您的知识回答问题。
+        """
 
-                            如果提供了文档内容，请基于文档内容回答问题；否则，请直接回答问题。"""
         if retriever:
             # 如果有向量存储，使用上下文回答问题
             template = """
             {system_context}
-            Answer the question based only on the following context:
+
+            请基于下列文本回答最后的问题:
             {context}
-            Question: 
+            
+            问题: 
             {question}
             """
             prompt = ChatPromptTemplate.from_template(template)
@@ -99,8 +102,9 @@ class LangChainService:
             # 如果没有向量存储，直接回答问题
             template = """
             {system_context}
-            Answer the following question:
-            Question: {question}
+
+            回答下列问题:
+            {question}
             """
             prompt = ChatPromptTemplate.from_template(template)
             chain = (
