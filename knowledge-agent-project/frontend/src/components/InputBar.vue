@@ -49,6 +49,8 @@ export default {
       // 图标资源
       onIcon,
       offIcon,
+      file: null, // 选中的文件
+      isUploading: false, // 上传状态
     };
   },
   methods: {
