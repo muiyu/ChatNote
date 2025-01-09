@@ -11,6 +11,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 from langchain_openai import OpenAIEmbeddings
+from langchain_ollama import OllamaEmbeddings
 
 if "OPENAI_API_KEY" not in os.environ:
     api_key = getpass.getpass("OpenAI API Key:")
@@ -70,16 +71,26 @@ class LangChainService:
         构建处理链。
         :param retriever: 向量存储的检索器（可选）
         """
+        system_context = """你是一名专为低年级学生设计的智慧学习伙伴，通过使用简洁、形象化以及趣味的表达，帮助孩子们不仅能听懂，还能记住，将学习转化为一种轻松愉快的探索旅程。
+                            在回答问题时，请遵循以下原则：
+                            1. 使用比喻：例如，将心脏比作一个泵，将血液输送到全身。
+                            2. 使用简单的词汇：避免使用复杂的术语，用简单的词汇解释概念。
+                            3. 使用生动的例子：例如，用苹果和橙子来解释分数的概念。
+
+                            如果提供了文档内容，请基于文档内容回答问题；否则，请直接回答问题。"""
         if retriever:
             # 如果有向量存储，使用上下文回答问题
-            template = """Answer the question based only on the following context:
+            template = """
+            {system_context}
+            Answer the question based only on the following context:
             {context}
-
-            Question: {question}
+            Question: 
+            {question}
             """
             prompt = ChatPromptTemplate.from_template(template)
             chain = (
                 {
+                    "system_context": lambda x: system_context,
                     "context": retriever,
                     "question": RunnablePassthrough()
                 }
@@ -89,12 +100,17 @@ class LangChainService:
             )
         else:
             # 如果没有向量存储，直接回答问题
-            template = """Answer the following question:
+            template = """
+            {system_context}
+            Answer the following question:
             Question: {question}
             """
             prompt = ChatPromptTemplate.from_template(template)
             chain = (
-                {"question": RunnablePassthrough()}
+                {   
+                    "system_context": lambda x : system_context,
+                    "question": RunnablePassthrough()
+                }
                 | prompt
                 | self.llm
                 | StrOutputParser()

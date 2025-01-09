@@ -71,14 +71,18 @@ export default {
       if (newTitle) {
         this.$emit('rename-conversation', { ...conversation, title: newTitle });
       }
-      this.activeDropdown = null; // 关闭下拉框
+      setTimeout(() => {
+        this.activeDropdown = null; // 延迟关闭下拉框
+      }, 0);
     },
     deleteConversation(conversation) {
       // 删除对话
       if (confirm(`确定要删除对话 "${conversation.title}" 吗？`)) {
         this.$emit('delete-conversation', conversation);
       }
-      this.activeDropdown = null; // 关闭下拉框
+      setTimeout(() => {
+        this.activeDropdown = null; // 延迟关闭下拉框
+      }, 0);
     },
   },
 };
