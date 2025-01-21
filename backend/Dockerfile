@@ -11,8 +11,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # 复制后端代码
 COPY . .
 
+# 复制 api-key.src 文件
+COPY api-key.src /app/api-key.src
+
 # 暴露端口
 EXPOSE 5000
 
 # 启动后端应用
-CMD ["python", "app.py"]
+CMD ["sh", "-c", "set -a && source /app/api-key.src && set +a && python app.py"]

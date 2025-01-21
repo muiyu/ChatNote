@@ -1,5 +1,5 @@
 # 使用官方 Node.js 镜像
-FROM node:16-slim
+FROM node:20-slim
 
 # 设置工作目录
 WORKDIR /app
@@ -9,6 +9,8 @@ COPY package.json package-lock.json ./
 
 # 安装依赖
 RUN npm install
+
+RUN npm install -g @vue/cli-service
 
 # 复制前端代码
 COPY . .
