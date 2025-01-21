@@ -9,3 +9,8 @@ npm install
 ```
 npm run serve
 ```
+或使用
+```
+pnpm serve
+```
+推荐使用后者
