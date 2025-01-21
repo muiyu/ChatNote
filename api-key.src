@@ -1,5 +1,0 @@
-export OPENAI_API_KEY=sk-opY6CKcbbMrAOfABAf5d1cA463Bd41D4881b979d1a1f8aC5
-export OPENAI_BASE_URL=https://api.yesapikey.com/v1
-export NEO4J_URI=neo4j+s://23d89325.databases.neo4j.io
-export NEO4J_USERNAME=neo4j
-export NEO4J_PASSWORD=F5QQSvpyW7nrkl-LaInJyaQhHtxT5-212N1aeebic74
